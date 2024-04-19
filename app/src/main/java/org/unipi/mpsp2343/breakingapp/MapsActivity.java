@@ -3,6 +3,7 @@ package org.unipi.mpsp2343.breakingapp;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -12,11 +13,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.unipi.mpsp2343.breakingapp.databinding.ActivityMapsBinding;
+import org.unipi.mpsp2343.breakingapp.models.BrakingEvent;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
+    private List<BrakingEvent> events;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +36,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        try{
+            events = (List<BrakingEvent>) getIntent().getSerializableExtra("EVENTS");
+        }
+        catch(Exception e) {
+            events = new ArrayList<>();
+            Toast.makeText(this, getResources().getString(R.string.data_retrieval_error), Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
@@ -43,10 +57,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        if(events.isEmpty()) {
+            Toast.makeText(this, getResources().getString(R.string.no_data_found), Toast.LENGTH_LONG).show();
+            return;
+        }
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng latLng = new LatLng(0,0);
+        for(BrakingEvent event : events) {
+            latLng = new LatLng(event.getLat(), event.getLon());
+            mMap.addMarker(new MarkerOptions().position(latLng).title(event.getTimestampFormatted()));
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,15f));
     }
 }

@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">Breaking App</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="map">Map</string>
+    <string name="sudden_braking_detector">Sudden Braking Detector</string>
+    <string name="_0_m_s">%.2f m/s²</string>
+    <string name="enable">Enable</string>
+    <string name="disable">Disable</string>
+    <string name="braking_detection_toast_message">Braking Detected</string>
+    <string name="data_retrieval_error">There was an error retrieving data.</string>
+    <string name="no_data_found">No data found.</string>
 </resources>
